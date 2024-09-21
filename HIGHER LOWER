@@ -1,0 +1,47 @@
+// Define the necessary variables
+var open_price = 0;
+var current_price = 0;
+var start_time = 0;
+var trade_duration = 1; // 1 minute
+var barrier = -0.63;
+
+// Function to get the open price of the candle
+function onNewCandle() {
+    open_price = getOpenPrice();  // Assume this function fetches the opening price of the candle
+    start_time = getCurrentTime();  // Fetch the current time in seconds
+}
+
+// Function to monitor the price at 45 seconds
+function checkPriceAt45Seconds() {
+    var current_time = getCurrentTime();
+    
+    // Check if we are at the 45 seconds mark of the 1-minute candle
+    if (current_time - start_time >= 45 && current_time - start_time < 46) {
+        current_price = getCurrentPrice();  // Assume this function fetches the current price
+        
+        // Check if the current price is higher than the open price
+        if (current_price > open_price) {
+            purchaseHigherContract();  // Buy 'Higher' contract if condition is met
+        }
+    }
+}
+
+// Function to purchase a higher contract
+function purchaseHigherContract() {
+    var contract = {
+        market: 'R_100',  // Replace with the desired market
+        contract_type: 'CALL',  // 'Higher' contract
+        barrier: -0.63,  // The barrier value
+        duration: trade_duration,  // Duration of the trade in minutes
+        currency: 'USD',  // Currency for trade
+        amount: 10  // Amount to stake on each trade
+    };
+    
+    // Place the trade
+    purchase(contract);
+}
+
+// Continuously run the bot every second (or appropriate interval)
+while (true) {
+    checkPriceAt45Seconds();
+}
